@@ -2,8 +2,8 @@
 using MecOrb.Application.Interfaces;
 using MecOrb.Domain.Entities;
 using MecOrb.Domain.Repositories;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MecOrb.Application
@@ -28,20 +28,46 @@ namespace MecOrb.Application
             return planets;
         }
 
-        public List<Planet> GetAllWithEphemerits()
+        public async Task<List<Planet>> GetAllWithEphemerits()
         {
             List<Planet> planets = _planetRepository.GetAll();
 
-            // HOW CAN DO THAT ASYNCHRONOUS, ALL PLANETS 
-            var tasks = planets.Select(async planet =>
-            {
-                planet.Ephemerities = await _nasaHorizonRepository.GetEphemerities(planet.NasaHorizonBodyId);
-            });
-
-            Task.WhenAll(tasks);
+            await GetPlanetsEphemerities(planets);
 
             return planets;
         }
 
+        public Planet GetPlanetWithEphemerits(int bodyId)
+        {
+            Planet planet = _planetRepository.GetByNasaBodyId(bodyId);
+
+            planet.Ephemerities = GetEphemeritiesByBodyId(planet.NasaHorizonBodyId).Result;
+
+            return planet;
+        }
+
+        private async Task GetPlanetsEphemerities(List<Planet> planets)
+        {
+            foreach (var planet in planets)
+            {
+                planet.Ephemerities = await GetEphemeritiesByBodyId(planet.NasaHorizonBodyId);
+            }
+        }
+
+        private async Task<Dictionary<string, VectorXYZ>> GetEphemeritiesByBodyId(int bodyId)
+        {
+            Dictionary<string, VectorXYZ> ephemerities = new Dictionary<string, VectorXYZ>();
+
+            try
+            {
+                ephemerities = await _nasaHorizonRepository.GetEphemerities(bodyId);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.Message + Environment.NewLine + e.StackTrace);
+            }
+
+            return ephemerities;
+        }
     }
 }

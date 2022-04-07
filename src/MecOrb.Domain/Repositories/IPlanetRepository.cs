@@ -6,5 +6,6 @@ namespace MecOrb.Domain.Repositories
     public interface IPlanetRepository
     {
         List<Planet> GetAll();
+        Planet GetByNasaBodyId(int bodyId);
     }
 }
