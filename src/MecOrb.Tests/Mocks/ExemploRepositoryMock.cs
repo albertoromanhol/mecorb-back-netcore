@@ -1,6 +1,4 @@
-﻿using MecOrb.Domain.Entities;
-using MecOrb.Domain.Repositories;
-using MecOrb.Domain.ValueObjects;
+﻿using MecOrb.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;

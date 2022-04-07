@@ -4,6 +4,6 @@ namespace MecOrb.Domain.Core.Entities
 {
     public abstract class Entity : Notifiable
     {
-        public int Id { get; set; }        
+        public int Id { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using MecOrb.Domain.Entities;
-using MecOrb.Domain.ValueObjects;
+﻿using MecOrb.Domain.ValueObjects;
 using System;
 using Xunit;
 

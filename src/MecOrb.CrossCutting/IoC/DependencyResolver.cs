@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using MecOrb.Application;
+﻿using MecOrb.Application;
 using MecOrb.Application.Interfaces;
 using MecOrb.Domain.Repositories;
 using MecOrb.Infrastructure.Repositories;
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MecOrb.CrossCutting.IoC
 {
@@ -21,20 +21,22 @@ namespace MecOrb.CrossCutting.IoC
 
         public static void AddSqlConnection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IDbConnection>(provider => {
+            services.AddScoped<IDbConnection>(provider =>
+            {
                 return new SqlConnection(configuration.GetSection("SQLConnection").Value);
             });
         }
 
         private static void RegisterApplications(IServiceCollection services)
         {
-            services.AddScoped<IExemploApplication, ExemploApplication>();
+            services.AddScoped<IPlanetApplication, PlanetApplication>();
+            services.AddScoped<ISimulationApplication, SimulationApplication>();
         }
 
         private static void RegisterRepositories(IServiceCollection services)
         {
-            services.AddScoped<IExemploRepository, ExemploRepository>();
-            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IPlanetRepository, PlanetRepository>();
+            services.AddScoped<INasaHorizonRepository, NasaHorizonRepository>();
         }
     }
 }

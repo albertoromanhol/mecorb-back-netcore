@@ -4,11 +4,11 @@ using MecOrb.Infrastructure.DbModels;
 
 namespace MecOrb.Infrastructure.Mapping
 {
-    public class ClientMap : Profile
+    public class PlanetMap : Profile
     {
-        public ClientMap()
+        public PlanetMap()
         {
-            CreateMap<ClientDbModel, Client>()
+            CreateMap<PlanetDbModel, Planet>()
                 .ReverseMap();
         }
     }

@@ -1,17 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
-using MecOrb.Api.Controllers;
 using MecOrb.Application;
-using MecOrb.Application.Models;
+using MecOrb.Domain.ValueObjects;
 using MecOrb.Tests.Fixtures;
-using MecOrb.Tests.Mocks;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Moq;
-using MecOrb.Domain.Repositories;
-using MecOrb.Domain.Entities;
-using MecOrb.Domain.ValueObjects;
 
 namespace MecOrb.Tests.Controllers
 {
@@ -60,7 +55,7 @@ namespace MecOrb.Tests.Controllers
             var result = controller.List();
 
             Assert.IsType<OkObjectResult>(result);
-            
+
             var objectResult = GetOkObject<IEnumerable<ExemploModel>>(result);
             Assert.Equal(2, objectResult.Count());
         }
@@ -103,8 +98,8 @@ namespace MecOrb.Tests.Controllers
         }
 
         private ExemploController CreateExemploController()
-        {                        
-            var exemploApplication = new ExemploApplication(_mapperFixture.Mapper, exemploRepository.Object);
+        {
+            var exemploApplication = new PlanetApplication(_mapperFixture.Mapper, exemploRepository.Object);
 
             return new ExemploController(_mapperFixture.Mapper, exemploApplication, exemploRepository.Object);
         }

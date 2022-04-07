@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace MecOrb.Domain.Repositories
 {
-    public interface IClientRepository
+    public interface IPlanetRepository
     {
-        IEnumerable<Client> ListAllByUser(int userId);
+        List<Planet> GetAll();
     }
 }

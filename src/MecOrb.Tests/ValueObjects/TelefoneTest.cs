@@ -1,5 +1,4 @@
-﻿using MecOrb.Domain.ValueObjects;
-using Xunit;
+﻿using Xunit;
 
 namespace MecOrb.Tests.ValueObjects
 {
@@ -40,7 +39,7 @@ namespace MecOrb.Tests.ValueObjects
         {
             var telefone = new Telefone(ddd, numero);
             var valorEsperado = $"{ddd}{numero}";
-            
+
             Assert.Equal(telefone.NumeroComDdd, valorEsperado);
             Assert.Equal(telefone.ToString(), valorEsperado);
         }

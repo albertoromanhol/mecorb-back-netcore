@@ -11,7 +11,7 @@ namespace MecOrb.Tests.Fixtures
             var config = new MapperConfiguration(opts =>
             {
                 opts.AddProfile(new Application.Mapping.ExemploMap());
-                opts.AddProfile(new Application.Mapping.ClientMap());
+                opts.AddProfile(new Application.Mapping.PlanetMap());
             });
 
             Mapper = config.CreateMapper();

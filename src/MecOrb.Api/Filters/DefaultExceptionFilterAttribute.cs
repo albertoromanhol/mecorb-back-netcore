@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MecOrb.Application.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
-using MecOrb.Application.Models;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 

@@ -1,5 +1,4 @@
-﻿using MecOrb.Domain.ValueObjects;
-using Xunit;
+﻿using Xunit;
 
 namespace MecOrb.Tests.ValueObjects
 {

@@ -1,6 +1,6 @@
 ﻿using Flunt.Notifications;
-using Microsoft.AspNetCore.Mvc;
 using MecOrb.Application.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace MecOrb.Api.Controllers

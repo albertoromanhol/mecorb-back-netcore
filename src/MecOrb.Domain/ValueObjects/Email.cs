@@ -4,10 +4,10 @@ using MecOrb.Domain.Core.ValueObjects;
 namespace MecOrb.Domain.ValueObjects
 {
     public class Email : ValueObject
-    {        
+    {
         public Email(string endereco)
         {
-            Endereco  = endereco;
+            Endereco = endereco;
 
             AddNotifications(new Contract()
                 .Requires()
