@@ -18,6 +18,9 @@ namespace MecOrb.Api
     [ExcludeFromCodeCoverage]
     public class Startup
     {
+
+        private readonly string CorsPolicy = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,6 +30,23 @@ namespace MecOrb.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicy,
+                builder =>
+                {
+                    builder.SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyOrigin()
+                    .WithHeaders("Content-Type",
+                                "X-Requested-With",
+                                "Authorization",
+                                "Access-Control-Allow-Headers",
+                                "Access-Control-Request-Headers",
+                                "Access-Control-Request-Method")
+                    .AllowAnyMethod();
+                });
+            });
+
             services.AddRouting(options => options.LowercaseUrls = true);
 
             services.AddControllers();
@@ -62,6 +82,8 @@ namespace MecOrb.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(CorsPolicy);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

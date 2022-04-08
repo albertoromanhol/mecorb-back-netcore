@@ -23,4 +23,9 @@
     <ProjectReference Include="..\MecOrb.Infrastructure\MecOrb.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Mocks\" />
+  </ItemGroup>
+
 </Project>
