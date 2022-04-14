@@ -36,6 +36,17 @@ namespace MecOrb.Application
 
             return planets;
         }
+        public async Task<List<Planet>> GetSunAndEarthWithEphemerits()
+        {
+            List<Planet> planets = new List<Planet>();
+
+            planets.Add(_planetRepository.GetByNasaBodyId(399));
+            planets.Add(_planetRepository.GetByNasaBodyId(0));
+
+            await GetPlanetsEphemerities(planets);
+
+            return planets;
+        }
 
         public Planet GetPlanetWithEphemerits(int bodyId)
         {

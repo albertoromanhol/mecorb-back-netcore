@@ -8,6 +8,7 @@ namespace MecOrb.Application.Interfaces
     {
         List<Planet> GetAll();
         Task<List<Planet>> GetAllWithEphemerits();
+        Task<List<Planet>> GetSunAndEarthWithEphemerits();
         Planet GetPlanetWithEphemerits(int bodyId);
     }
 }

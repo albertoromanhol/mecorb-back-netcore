@@ -1,4 +1,6 @@
-﻿namespace MecOrb.Domain.Entities
+﻿using System;
+
+namespace MecOrb.Domain.Entities
 {
     public class VectorXYZ
     {
@@ -19,37 +21,37 @@
             Z = z;
         }
 
-        //public static VectorXYZ operator +(VectorXYZ v1, VectorXYZ v2)
-        //    => new VectorXYZ
-        //    {
-        //        X = v1.X + v2.X,
-        //        Y = v1.Y + v2.Y,
-        //        Z = v1.Z + v2.Z,
-        //    };
+        public static VectorXYZ operator +(VectorXYZ v1, VectorXYZ v2)
+            => new VectorXYZ
+            {
+                X = v1.X + v2.X,
+                Y = v1.Y + v2.Y,
+                Z = v1.Z + v2.Z,
+            };
 
-        //public static VectorXYZ operator -(VectorXYZ v1, VectorXYZ v2)
-        //    => new VectorXYZ
-        //    {
-        //        X = v1.X - v2.X,
-        //        Y = v1.Y - v2.Y,
-        //        Z = v1.Z - v2.Z,
-        //    };
+        public static VectorXYZ operator -(VectorXYZ v1, VectorXYZ v2)
+            => new VectorXYZ
+            {
+                X = v1.X - v2.X,
+                Y = v1.Y - v2.Y,
+                Z = v1.Z - v2.Z,
+            };
 
-        //public static VectorXYZ operator *(VectorXYZ v1, double value)
-        //    => new VectorXYZ
-        //    {
-        //        X = v1.X * value,
-        //        Y = v1.Y * value,
-        //        Z = v1.Z * value,
-        //    };
+        public static VectorXYZ operator *(VectorXYZ v1, double value)
+            => new VectorXYZ
+            {
+                X = v1.X * value,
+                Y = v1.Y * value,
+                Z = v1.Z * value,
+            };
 
-        //public static VectorXYZ operator /(VectorXYZ v1, double value)
-        //    => new VectorXYZ
-        //    {
-        //        X = v1.X / value,
-        //        Y = v1.Y / value,
-        //        Z = v1.Z / value,
-        //    };
+        public static VectorXYZ operator /(VectorXYZ v1, double value)
+            => new VectorXYZ
+            {
+                X = v1.X / value,
+                Y = v1.Y / value,
+                Z = v1.Z / value,
+            };
         //public static VectorXYZ operator *(Matrix matrix, VectorXYZ v1)
         //    => new VectorXYZ
         //    {
@@ -57,6 +59,6 @@
         //        Y = Methods.dotProduct(matrix.RowY(), v1),
         //        Z = Methods.dotProduct(matrix.RowZ(), v1),
         //    };
-        //public double Norm() => Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2));
+        public double Norm() => Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2));
     }
 }

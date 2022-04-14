@@ -11,6 +11,6 @@ namespace MecOrb.Application.Models
         public double Mass { get; set; }
         public double Radius { get; set; }
         public Dictionary<string, VectorXYZModel> Ephemerities { get; set; }
-
+        public TrajectoryModel BodyTrajectory { get; set; }
     }
 }

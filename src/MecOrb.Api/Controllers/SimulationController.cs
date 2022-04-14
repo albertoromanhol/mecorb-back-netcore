@@ -4,6 +4,7 @@ using MecOrb.Application.Models;
 using MecOrb.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace MecOrb.Api.Controllers
 {
@@ -30,6 +31,17 @@ namespace MecOrb.Api.Controllers
             Simulation simulationResult = _simulationApplication.SimulateTwoBodies(simulationConfig);
 
             return Ok(_mapper.Map<Simulation, SimulationModel>(simulationResult));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List<PlanetModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public IActionResult SimulateEarthSun()
+        {
+            List<Planet> planets = _simulationApplication.GetPlanetsAcceleration();
+
+            return Ok(_mapper.Map<List<Planet>, List<PlanetModel>>(planets));
         }
 
 
