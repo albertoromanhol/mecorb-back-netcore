@@ -132,9 +132,9 @@ namespace MecOrb.Application
             (VectorXYZ bodyVelocity, VectorXYZ bodyPosition) = GetBodyVelocityAndPosition(planet);
 
             VectorXYZ accelerationk1 = CalculateK(planet, bodyVelocity, bodyPosition);
-            VectorXYZ accelerationk2 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk1, 0.5*_timeStep);
-            VectorXYZ accelerationk3 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk2, 0.5*_timeStep);
-            VectorXYZ accelerationk4 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk3, 0.5*_timeStep);
+            VectorXYZ accelerationk2 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk1, 0.5 * _timeStep);
+            VectorXYZ accelerationk3 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk2, 0.5 * _timeStep);
+            VectorXYZ accelerationk4 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk3, 0.5 * _timeStep);
 
             return (accelerationk1 + accelerationk2 * 2 + accelerationk3 * 2 + accelerationk4) / 6;
         }

@@ -4,7 +4,6 @@ using MecOrb.Application.Models;
 using MecOrb.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace MecOrb.Api.Controllers
 {
