@@ -28,6 +28,12 @@ namespace MecOrb.Application
             return planets;
         }
 
+        public async Task<List<Planet>> GetEphemerits(List<Planet> planets, DateTime initialDate)
+        {
+            await GetPlanetsEphemerities(planets);
+
+            return planets;
+        }
         public async Task<List<Planet>> GetAllWithEphemerits()
         {
             List<Planet> planets = _planetRepository.GetAll();
@@ -57,21 +63,21 @@ namespace MecOrb.Application
             return planet;
         }
 
-        private async Task GetPlanetsEphemerities(List<Planet> planets)
+        private async Task GetPlanetsEphemerities(List<Planet> planets, DateTime? initialDate = null)
         {
             foreach (var planet in planets)
             {
-                planet.Ephemerities = await GetEphemeritiesByBodyId(planet.NasaHorizonBodyId);
+                planet.Ephemerities = await GetEphemeritiesByBodyId(planet.NasaHorizonBodyId, initialDate);
             }
         }
 
-        private async Task<Dictionary<string, VectorXYZ>> GetEphemeritiesByBodyId(int bodyId)
+        private async Task<Dictionary<string, VectorXYZ>> GetEphemeritiesByBodyId(int bodyId, DateTime? initialDate = null)
         {
             Dictionary<string, VectorXYZ> ephemerities = new Dictionary<string, VectorXYZ>();
 
             try
             {
-                ephemerities = await _nasaHorizonRepository.GetEphemerities(bodyId);
+                ephemerities = await _nasaHorizonRepository.GetEphemerities(bodyId, initialDate);
             }
             catch (Exception e)
             {
@@ -80,5 +86,6 @@ namespace MecOrb.Application
 
             return ephemerities;
         }
+
     }
 }

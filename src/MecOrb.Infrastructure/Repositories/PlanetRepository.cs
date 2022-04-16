@@ -46,6 +46,7 @@ namespace MecOrb.Infrastructure.Repositories
 
             List<PlanetDbModel> planets = new List<PlanetDbModel>()
             {
+                sun,
                 mercury,
                 venus,
                 earth,
@@ -54,8 +55,7 @@ namespace MecOrb.Infrastructure.Repositories
                 saturn,
                 uranus,
                 neptune,
-                sun,
-                moon
+                //moon
             };
 
             return planets;

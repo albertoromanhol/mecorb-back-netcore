@@ -4,11 +4,11 @@ using MecOrb.Domain.Entities;
 
 namespace MecOrb.Application.Mapping
 {
-    public class SimulationMap : Profile
+    public class SimulationResultMap : Profile
     {
-        public SimulationMap()
+        public SimulationResultMap()
         {
-            CreateMap<Simulation, SimulationModel>()
+            CreateMap<SimulationResult, SimulationResultModel>()
                 .ReverseMap();
         }
     }

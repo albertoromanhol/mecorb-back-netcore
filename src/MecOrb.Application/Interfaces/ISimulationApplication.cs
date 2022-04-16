@@ -6,7 +6,6 @@ namespace MecOrb.Application.Interfaces
 {
     public interface ISimulationApplication
     {
-        Simulation SimulateTwoBodies(SimulationConfigModel planetsToSimulate);
-        List<Planet> GetPlanetsAcceleration();
+        SimulationResult Simulate(SimulationConfigModel planetsToSimulate);
     }
 }

@@ -22,29 +22,14 @@ namespace MecOrb.Api.Controllers
         }
 
         [HttpPost]
-        [Route("two-bodies")]
-        [ProducesResponseType(typeof(SimulationModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SimulationResultModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public IActionResult SimulateTwoBodies(SimulationConfigModel simulationConfig)
+        public IActionResult Simulate(SimulationConfigModel simulationConfig)
         {
-            Simulation simulationResult = _simulationApplication.SimulateTwoBodies(simulationConfig);
+            SimulationResult simulationResult = _simulationApplication.Simulate(simulationConfig);
 
-            return Ok(_mapper.Map<Simulation, SimulationModel>(simulationResult));
+            return Ok(_mapper.Map<SimulationResult, SimulationResultModel>(simulationResult));
         }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(List<PlanetModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        public IActionResult SimulateEarthSun()
-        {
-            List<Planet> planets = _simulationApplication.GetPlanetsAcceleration();
-
-            return Ok(_mapper.Map<List<Planet>, List<PlanetModel>>(planets));
-        }
-
-
-
     }
 }

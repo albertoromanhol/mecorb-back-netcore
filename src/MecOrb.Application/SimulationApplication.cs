@@ -15,6 +15,7 @@ namespace MecOrb.Application
 
         private List<Planet> _planets;
         private double _timeStep;
+        private double _simulationTime;
 
         public SimulationApplication(IMapper mapper, IPlanetApplication planetApplication)
         {
@@ -22,31 +23,60 @@ namespace MecOrb.Application
             _planetApplication = planetApplication;
         }
 
-        public Simulation SimulateTwoBodies(SimulationConfigModel simulationConfigModel)
+        public SimulationResult Simulate(SimulationConfigModel simulationConfigModel)
         {
-            Simulation simulation = new Simulation();
+            SimulationResult simulation = new SimulationResult();
 
             SimulationConfig simulationConfig = _mapper.Map<SimulationConfigModel, SimulationConfig>(simulationConfigModel);
+
+            SetupSimulation(simulationConfig);
+
+            simulation.Planets = GetPlanetsAcceleration();
 
             return simulation;
         }
 
-        public List<Planet> GetPlanetsAcceleration()
+        private void SetupSimulation(SimulationConfig simulationConfig)
         {
-            // we can do it better
-            _planets = GetPlanets(); // it will be pass as props
+            SetupSimulationTimeParams(simulationConfig.SimulationDays);
+            SetupSimulationPlanets(simulationConfig.Planets, simulationConfig.InitialDate);
+        }
 
-            int finalNumberSteps = 10000; //numberSteps param
-            int finalSimulationDays = 365; //simulationDays param
+        private void SetupSimulationTimeParams(int simulationDays = 365, int simulationSteps = 10_000)
+        {
+
+            int finalNumberSteps = simulationSteps;
+            int finalSimulationDays = simulationDays;
 
             double simulationTime = finalSimulationDays * 24 * 60 * 60;
             double timeStep = simulationTime / finalNumberSteps;
 
+            _simulationTime = simulationTime;
             _timeStep = timeStep;
+        }
 
+        private void SetupSimulationPlanets(List<Planet> planets, DateTime initialDate)
+        {
+            planets = _planetApplication.GetEphemerits(planets, initialDate).Result;
+
+            foreach (Planet planet in planets)
+            {
+                (VectorXYZ bodyVelocity, VectorXYZ bodyPosition) = GetBodyVelocityAndPosition(planet);
+                planet.CurrentPosition = bodyPosition;
+                planet.CurrentVelocity = bodyVelocity;
+
+                // TODO: AddReferenceBodyPosition 
+                planet.StartTrajectory();
+            }
+
+            _planets = planets;
+        }
+
+        private List<Planet> GetPlanetsAcceleration()
+        {
             double currentTime = 0;
             // we can do it better
-            while (currentTime <= simulationTime)
+            while (currentTime <= _simulationTime)
             {
                 // we can do it better
                 foreach (var planet in _planets)
@@ -58,10 +88,10 @@ namespace MecOrb.Application
                     planet.BodyTrajectory.AddVector(planet.CurrentPosition);
                 }
 
-                currentTime += timeStep;
+                currentTime += _timeStep;
             }
 
-            // ReduceTrajectories(listBodies, simulationParameters.NumberSteps);
+            // TODO: ReduceTrajectories(listBodies, simulationParameters.NumberSteps);
 
             return _planets;
         }
@@ -102,9 +132,9 @@ namespace MecOrb.Application
             (VectorXYZ bodyVelocity, VectorXYZ bodyPosition) = GetBodyVelocityAndPosition(planet);
 
             VectorXYZ accelerationk1 = CalculateK(planet, bodyVelocity, bodyPosition);
-            VectorXYZ accelerationk2 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk1, 0.5 * _timeStep);
-            VectorXYZ accelerationk3 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk2, 0.5 * _timeStep);
-            VectorXYZ accelerationk4 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk3, 0.5 * _timeStep);
+            VectorXYZ accelerationk2 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk1, 0.5*_timeStep);
+            VectorXYZ accelerationk3 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk2, 0.5*_timeStep);
+            VectorXYZ accelerationk4 = CalculateK(planet, bodyVelocity, bodyPosition, accelerationk3, 0.5*_timeStep);
 
             return (accelerationk1 + accelerationk2 * 2 + accelerationk3 * 2 + accelerationk4) / 6;
         }
