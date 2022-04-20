@@ -3,6 +3,7 @@ using MecOrb.Api.Filters;
 using MecOrb.Api.Logging;
 using MecOrb.CrossCutting.Assemblies;
 using MecOrb.CrossCutting.IoC;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,8 @@ namespace MecOrb.Api
 
             services.AddMvc(options => options.Filters.Add(new DefaultExceptionFilterAttribute()));
 
+            services.AddApplicationInsightsTelemetry(opt => opt.EnableActiveTelemetryConfigurationSetup = true);
+
             services.AddLoggingSerilog();
 
             services.AddAutoMapper(AssemblyUtil.GetCurrentAssemblies());
@@ -78,6 +81,9 @@ namespace MecOrb.Api
                 c.IncludeXmlComments(apiPath);
                 c.IncludeXmlComments(applicationPath);
             });
+
+            services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
+            services.AddApplicationInsightsTelemetry();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -88,6 +94,9 @@ namespace MecOrb.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseRequestBodyLogging();
+            app.UseResponseBodyLogging();
 
             app.UsePathBase("/MecOrb");
             app.UseSwagger();
