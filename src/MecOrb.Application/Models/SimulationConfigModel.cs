@@ -8,5 +8,6 @@ namespace MecOrb.Application.Models
         public List<PlanetModel> Planets { get; set; }
         public DateTime InitialDate { get; set; }
         public int SimulationDays { get; set; }
+        public int? SimulationSteps { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace MecOrb.Domain.Entities
         public List<double> Y { get; set; }
         public List<double> Z { get; set; }
 
-        public void AddVector(VectorXYZ vector)
+        public void AddVector(Vector3 vector)
         {
             this.X.Add(vector.X);
             this.Y.Add(vector.Y);

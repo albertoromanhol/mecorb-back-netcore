@@ -1,6 +1,6 @@
 ﻿namespace MecOrb.Application.Models
 {
-    public class VectorXYZModel
+    public class Vector3Model
     {
         public double X { get; set; }
         public double Y { get; set; }

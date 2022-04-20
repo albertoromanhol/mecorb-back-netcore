@@ -71,9 +71,9 @@ namespace MecOrb.Application
             }
         }
 
-        private async Task<Dictionary<string, VectorXYZ>> GetEphemeritiesByBodyId(int bodyId, DateTime? initialDate = null)
+        private async Task<Dictionary<string, Vector3>> GetEphemeritiesByBodyId(int bodyId, DateTime? initialDate = null)
         {
-            Dictionary<string, VectorXYZ> ephemerities = new Dictionary<string, VectorXYZ>();
+            Dictionary<string, Vector3> ephemerities = new Dictionary<string, Vector3>();
 
             try
             {

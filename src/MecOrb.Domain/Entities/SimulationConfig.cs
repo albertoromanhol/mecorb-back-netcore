@@ -9,5 +9,6 @@ namespace MecOrb.Domain.Entities
         public List<Planet> Planets { get; set; }
         public DateTime InitialDate { get; set; }
         public int SimulationDays { get; set; }
+        public int? SimulationSteps { get; set; }
     }
 }

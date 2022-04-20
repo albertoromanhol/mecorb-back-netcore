@@ -4,11 +4,11 @@ using MecOrb.Domain.Entities;
 
 namespace MecOrb.Application.Mapping
 {
-    public class VectorXYZMap : Profile
+    public class Vector3Map : Profile
     {
-        public VectorXYZMap()
+        public Vector3Map()
         {
-            CreateMap<VectorXYZ, VectorXYZModel>()
+            CreateMap<Vector3, Vector3Model>()
                 .ReverseMap();
         }
     }

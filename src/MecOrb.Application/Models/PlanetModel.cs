@@ -10,7 +10,7 @@ namespace MecOrb.Application.Models
         public int NasaHorizonBodyId { get; set; }
         public double Mass { get; set; }
         public double Radius { get; set; }
-        public Dictionary<string, VectorXYZModel> Ephemerities { get; set; }
+        public Dictionary<string, Vector3Model> Ephemerities { get; set; }
         public TrajectoryModel BodyTrajectory { get; set; }
     }
 }

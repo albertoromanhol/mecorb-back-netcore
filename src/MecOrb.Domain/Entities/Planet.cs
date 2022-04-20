@@ -11,19 +11,19 @@ namespace MecOrb.Domain.Entities
         public double Mass { get; set; }
         public double Radius { get; set; }
         public string ReferenceBodyId { get; set; }
-        public VectorXYZ CurrentPosition { get; set; }
-        public VectorXYZ CurrentVelocity { get; set; }
-        public VectorXYZ CurrentAcceleration { get; set; }
-        public VectorXYZ BasePosition { get; set; }
-        public VectorXYZ BaseVelocity { get; set; }
-        public Trajectory BodyTrajectory { get; set; }
-        public Dictionary<string, VectorXYZ> Ephemerities { get; set; }
+        public Vector3 CurrentPosition { get; set; }
+        public Vector3 CurrentVelocity { get; set; }
+        public Vector3 CurrentAcceleration { get; set; }
+        public Vector3 BasePosition { get; set; }
+        public Vector3 BaseVelocity { get; set; }
+        public Trajectory Trajectory { get; set; }
+        public Dictionary<string, Vector3> Ephemerities { get; set; }
 
 
         public void StartTrajectory()
         {
-            BodyTrajectory = new Trajectory();
-            BodyTrajectory.AddVector(CurrentPosition);
+            Trajectory = new Trajectory();
+            Trajectory.AddVector(CurrentPosition);
         }
     }
 }

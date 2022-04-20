@@ -11,12 +11,12 @@ namespace MecOrb.Infrastructure.Repositories
 {
     public class NasaHorizonRepository : INasaHorizonRepository
     {
-        public async Task<Dictionary<string, VectorXYZ>> GetEphemerities(int bodyId, DateTime? simulationDate = null)
+        public async Task<Dictionary<string, Vector3>> GetEphemerities(int bodyId, DateTime? simulationDate = null)
         {
             (string startDate, string endDate) = GetStartDate(simulationDate);
 
             string nasaHorizonResponse = await GetNasaHorizonResponse(bodyId, startDate, endDate);
-            Dictionary<string, VectorXYZ> ephemerities = CreateNasaEphemeritiesVector(nasaHorizonResponse);
+            Dictionary<string, Vector3> ephemerities = CreateNasaEphemeritiesVector(nasaHorizonResponse);
 
             return ephemerities;
         }
@@ -40,9 +40,9 @@ namespace MecOrb.Infrastructure.Repositories
             return response;
         }
 
-        private Dictionary<string, VectorXYZ> CreateNasaEphemeritiesVector(string nasaHorizonResponse)
+        private Dictionary<string, Vector3> CreateNasaEphemeritiesVector(string nasaHorizonResponse)
         {
-            Dictionary<string, VectorXYZ> ephemerities = new Dictionary<string, VectorXYZ>();
+            Dictionary<string, Vector3> ephemerities = new Dictionary<string, Vector3>();
 
             List<string> reponseString = nasaHorizonResponse
                 .Split("$$SOE")[1]
@@ -53,8 +53,8 @@ namespace MecOrb.Infrastructure.Repositories
             string positionString = reponseString[1];
             string velocityString = reponseString[2];
 
-            VectorXYZ position = CreateVectorXYZ(positionString);
-            VectorXYZ velocity = CreateVectorXYZ(velocityString);
+            Vector3 position = CreateVectorXYZ(positionString);
+            Vector3 velocity = CreateVectorXYZ(velocityString);
 
             ephemerities.Add("position", position);
             ephemerities.Add("velocity", velocity);
@@ -62,7 +62,7 @@ namespace MecOrb.Infrastructure.Repositories
             return ephemerities;
         }
 
-        private VectorXYZ CreateVectorXYZ(string fullString)
+        private Vector3 CreateVectorXYZ(string fullString)
         {
             List<string> clearedStrings = GetCleanStringInList(fullString);
 
@@ -70,7 +70,7 @@ namespace MecOrb.Infrastructure.Repositories
             double yRef = ParaseStringToDouble(clearedStrings[1]);
             double zRef = ParaseStringToDouble(clearedStrings[2]);
 
-            VectorXYZ vector = new VectorXYZ(xRef, yRef, zRef);
+            Vector3 vector = new Vector3(xRef, yRef, zRef);
 
             return vector;
         }

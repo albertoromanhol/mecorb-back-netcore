@@ -7,6 +7,6 @@ namespace MecOrb.Domain.Repositories
 {
     public interface INasaHorizonRepository
     {
-        Task<Dictionary<string, VectorXYZ>> GetEphemerities(int bodyId, DateTime? simulationDate = null);
+        Task<Dictionary<string, Vector3>> GetEphemerities(int bodyId, DateTime? simulationDate = null);
     }
 }
