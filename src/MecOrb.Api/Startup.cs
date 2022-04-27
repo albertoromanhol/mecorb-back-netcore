@@ -95,8 +95,8 @@ namespace MecOrb.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRequestBodyLogging();
-            app.UseResponseBodyLogging();
+            //app.UseRequestBodyLogging();
+            //app.UseResponseBodyLogging();
 
             app.UsePathBase("/MecOrb");
             app.UseSwagger();
