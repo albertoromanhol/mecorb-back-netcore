@@ -18,6 +18,7 @@ namespace MecOrb.Application
         private double _timeStep;
         private double _simulationTimeSeconds;
         private SimulationConfig _simulationConfig;
+        private SimulationResult _simulationResult;
 
         private readonly int DAY_IN_HOURS = 24;
         private readonly int HOUR_IN_MINUTES = 60;
@@ -31,7 +32,7 @@ namespace MecOrb.Application
 
         public SimulationResult Simulate(SimulationConfigModel simulationConfigModel)
         {
-            SimulationResult simulation = new SimulationResult();
+            _simulationResult = new SimulationResult();
 
             _simulationConfig = _mapper.Map<SimulationConfigModel, SimulationConfig>(simulationConfigModel);
 
@@ -39,27 +40,52 @@ namespace MecOrb.Application
             GetPlanetsAcceleration();
             ReduceTrajectories();
 
-            simulation.Planets = _planets;
+            _simulationResult.Planets = _planets;
 
-            return simulation;
+            return _simulationResult;
+        }
+
+        public SimulationResult SimulateForManouver(SimulationConfig simulationConfig)
+        {
+
+            _simulationResult = new SimulationResult();
+
+            _simulationConfig = simulationConfig;
+
+            SetupSimulation(false);
+            GetPlanetsAcceleration();
+            ReduceTrajectories();
+
+            _simulationResult.Planets = _planets;
+
+            return _simulationResult;
         }
 
         #region[SETUP SIMULATOR]
-        private void SetupSimulation()
+        private void SetupSimulation(bool withEphemerities = true)
         {
             SetupSimulationTimeParams(_simulationConfig.SimulationDays, _simulationConfig.SimulationSteps);
-            SetupSimulationPlanets(_simulationConfig.Planets, _simulationConfig.InitialDate);
+            SetupSimulationPlanets(_simulationConfig.Planets, _simulationConfig.InitialDate, withEphemerities);
         }
 
         private void SetupSimulationTimeParams(int simulationDays = 365, int? simulationSteps = 1_000_000)
         {
-            int finalNumberSteps = simulationSteps.Value;
+            int finalNumberSteps = simulationSteps.HasValue ? simulationSteps.Value : 1_000_000;
             int finalSimulationDays = simulationDays;
 
-            double simulationTimeSeconds = finalSimulationDays
+            double simulationTimeSeconds = 0.0;
+
+            if (_simulationConfig.SimulationInSeconds.HasValue)
+            {
+                simulationTimeSeconds = _simulationConfig.SimulationInSeconds.Value;
+            }
+            else
+            {
+                simulationTimeSeconds = finalSimulationDays
                                             * DAY_IN_HOURS
                                             * HOUR_IN_MINUTES
                                             * MINUTE_IN_SECONDS;
+            }
 
             double timeStep = simulationTimeSeconds / finalNumberSteps;
 
@@ -67,9 +93,10 @@ namespace MecOrb.Application
             _timeStep = timeStep;
         }
 
-        private void SetupSimulationPlanets(List<Planet> planets, DateTime initialDate)
+        private void SetupSimulationPlanets(List<Planet> planets, DateTime initialDate, bool withEphemerities = true)
         {
-            planets = _planetApplication.GetEphemerits(planets, initialDate).Result;
+            if (withEphemerities)
+                planets = _planetApplication.GetEphemerits(planets, initialDate).Result;
 
             foreach (Planet planet in planets)
             {
@@ -90,18 +117,27 @@ namespace MecOrb.Application
         #region[ACCELERATION]
         private void GetPlanetsAcceleration()
         {
-            double currentTime = 0;
-            // we can do it better
-            while (currentTime <= _simulationTimeSeconds)
+            try
             {
+                double currentTime = 0;
                 // we can do it better
-                foreach (Planet planet in _planets)
+                while (currentTime <= _simulationTimeSeconds)
                 {
-                    UpdatePlanetTrajectory(planet);
-                }
+                    // we can do it better
+                    foreach (Planet planet in _planets)
+                    {
+                        UpdatePlanetTrajectory(planet);
+                    }
 
-                currentTime += _timeStep;
+                    currentTime += _timeStep;
+                }
             }
+            catch (CollisionException collisionException)
+            {
+                // write in _result
+                Console.WriteLine(collisionException.Message);
+            }
+
         }
 
         private void UpdatePlanetTrajectory(Planet planet)
@@ -134,12 +170,11 @@ namespace MecOrb.Application
         private Vector3 CalculateDistance(Planet planet, Planet secondPlanet, Vector3 position)
         {
             Vector3 distance = secondPlanet.CurrentPosition - position; //verify
+            double distanceNorm = distance.Norm();
 
-            if (distance.Norm() <= (secondPlanet.Radius + planet.Radius))
+            if (distanceNorm <= (secondPlanet.Radius + planet.Radius))
             {
-                Console.WriteLine(planet.Name);
-                // TODO: VERIFICAR COMO ADICIONAR EXCEPTION DE COLISÃO, PROGRAMA DEVE PARAR
-                //throw new CollisionException(targetBody.Name, externalBody.Name);
+                throw new CollisionException(planet.Name, secondPlanet.Name);
             }
 
             return distance;
@@ -186,15 +221,25 @@ namespace MecOrb.Application
             Vector3 bodyVelocity = planet.CurrentVelocity;
             Vector3 bodyPosition = planet.CurrentPosition;
 
-            if (bodyVelocity == null && !planet.Ephemerities.TryGetValue("velocity", out bodyVelocity))
+            if (bodyVelocity == null && planet.Ephemerities != null && !planet.Ephemerities.TryGetValue("velocity", out bodyVelocity))
             {
                 bodyVelocity = planet.BaseVelocity;
             }
 
-            if (bodyPosition == null && !planet.Ephemerities.TryGetValue("position", out bodyPosition))
+            if (bodyPosition == null && planet.Ephemerities != null && !planet.Ephemerities.TryGetValue("position", out bodyPosition))
             {
                 bodyPosition = planet.BasePosition;
             };
+
+            if (bodyVelocity == null)
+            {
+                bodyVelocity = new Vector3();
+            }
+
+            if (bodyPosition == null)
+            {
+                bodyPosition = new Vector3();
+            }
 
             return (bodyVelocity, bodyPosition);
         }

@@ -10,7 +10,6 @@ namespace MecOrb.Domain.Entities
         public int NasaHorizonBodyId { get; set; }
         public double Mass { get; set; }
         public double Radius { get; set; }
-        public string ReferenceBodyId { get; set; }
         public Vector3 CurrentPosition { get; set; }
         public Vector3 CurrentVelocity { get; set; }
         public Vector3 CurrentAcceleration { get; set; }

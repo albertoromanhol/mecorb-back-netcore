@@ -31,6 +31,7 @@ namespace MecOrb.CrossCutting.IoC
         {
             services.AddScoped<IPlanetApplication, PlanetApplication>();
             services.AddScoped<ISimulationApplication, SimulationApplication>();
+            services.AddScoped<IManouverApplication, ManouverApplication>();
         }
 
         private static void RegisterRepositories(IServiceCollection services)

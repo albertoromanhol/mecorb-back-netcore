@@ -5,6 +5,7 @@ namespace MecOrb.Application.Interfaces
 {
     public interface ISimulationApplication
     {
-        SimulationResult Simulate(SimulationConfigModel planetsToSimulate);
+        SimulationResult Simulate(SimulationConfigModel simulationConfigModel);
+        SimulationResult SimulateForManouver(SimulationConfig simulationConfig);
     }
 }
