@@ -18,9 +18,8 @@ namespace MecOrb.Application
 
         private ManouverResult _manouverResult;
         private ManouverConfig _manouverConfig;
-        private Orbit _initialOrbit;
-        private Orbit _transferOrbit;
-        private Orbit _finalOrbit;
+
+        private Dictionary<string, Orbit> _manouverOrbits;
 
         private Planet _earth;
 
@@ -29,83 +28,145 @@ namespace MecOrb.Application
             _mapper = mapper;
             _planetRepository = planetRepository;
             _simulationApplication = simulationApplication;
+
+            _manouverOrbits = new Dictionary<string, Orbit>();
         }
 
-        public ManouverResult Simulate(ManouverConfigModel manouverConfigModel)
+        #region[METHODS]
+
+        public ManouverResult Hohmann(ManouverConfigModel manouverConfigModel)
         {
             _manouverResult = new ManouverResult();
 
             _manouverConfig = _mapper.Map<ManouverConfigModel, ManouverConfig>(manouverConfigModel);
 
-            SetupOrbits();
-            SetupTransferOrbit();
-            CalculateManouver();
+            SetupInitialOrbits();
+            SetupHohmannTransferOrbit();
+            CalculateHohmannManouver();
+
+            SimulateManouver();
+
+            return _manouverResult;
+        }
+        public ManouverResult BiElliptic(ManouverConfigModel manouverConfigModel)
+        {
+            _manouverResult = new ManouverResult();
+
+            _manouverConfig = _mapper.Map<ManouverConfigModel, ManouverConfig>(manouverConfigModel);
+
+            SetupInitialOrbits();
+            SetupBiEllipticTransferOrbit();
+            CalculateBiEllipticManouver();
 
             SimulateManouver();
 
             return _manouverResult;
         }
 
-        private void SetupOrbits()
+        #endregion[METHODS]
+
+        private void SetupInitialOrbits()
         {
-            _initialOrbit = GetOrbitParameters(_manouverConfig.InitialOrbit, "Orbita Inicial");
-            _finalOrbit = GetOrbitParameters(_manouverConfig.FinalOrbit, "Orbita Final");
+            _manouverResult.DeltaV = new Dictionary<string, double>();
+
+            Orbit initialOrbit = GetOrbitParameters(_manouverConfig.InitialOrbit, "Orbita Inicial");
+            Orbit finalOrbit = GetOrbitParameters(_manouverConfig.FinalOrbit, "Orbita Final");
+
+            _manouverOrbits.Add("initialOrbit", initialOrbit);
+            _manouverOrbits.Add("finalOrbit", finalOrbit);
         }
 
-        private void SetupTransferOrbit()
+        #region[HOHMANN]
+
+        private void SetupHohmannTransferOrbit()
         {
-            _transferOrbit = new Orbit();
+            Orbit hohmannTransferOrbit = new Orbit();
 
-            _transferOrbit.PerigeeRadius = _initialOrbit.PerigeeRadius;
-            _transferOrbit.ApogeeRadius = _finalOrbit.ApogeeRadius;
+            hohmannTransferOrbit.PerigeeRadius = _manouverOrbits["initialOrbit"].PerigeeRadius;
+            hohmannTransferOrbit.ApogeeRadius = _manouverOrbits["finalOrbit"].ApogeeRadius;
 
-            _transferOrbit = GetOrbitParameters(_transferOrbit, "Orbita de Transferencia", true);
+            hohmannTransferOrbit = GetOrbitParameters(hohmannTransferOrbit, "Orbita de Transferência", true);
+
+            _manouverOrbits.Add("transferOrbit", hohmannTransferOrbit);
         }
 
-        private void CalculateManouver()
+        private void CalculateHohmannManouver()
         {
+            double firstDeltaV = _manouverOrbits["transferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
 
-            double firstDeltaV = _transferOrbit.PerigeeVelocity - _initialOrbit.PerigeeVelocity;
+            double secondDeltaV = _manouverOrbits["finalOrbit"].ApogeeVelocity - _manouverOrbits["transferOrbit"].ApogeeVelocity;
 
-            double secondDeltaV = _finalOrbit.ApogeeVelocity - _transferOrbit.ApogeeVelocity;
+            double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV);
 
-            double totalDeltaV = firstDeltaV + secondDeltaV;
-
-            _manouverResult.FirstDeltaV = firstDeltaV;
-            _manouverResult.SecondDeltaV = secondDeltaV;
-            _manouverResult.TotalDeltaV = totalDeltaV;
+            _manouverResult.DeltaV.Add("Hohmann Primeiro Delta V", firstDeltaV);
+            _manouverResult.DeltaV.Add("Hohmann Segundo Delta V", secondDeltaV);
+            _manouverResult.DeltaV.Add("Hohmann Delta V Total", totalDeltaV);
         }
+
+        #endregion[HOHMANN]
+
+        #region[BI ELLIPTIC]
+        private void SetupBiEllipticTransferOrbit()
+        {
+            SetupFirstBiEllipticOrbit();
+            SetupSecondBiEllipticOrbit();
+        }
+
+        private void SetupFirstBiEllipticOrbit()
+        {
+            Orbit firstTransferOrbit = new Orbit();
+
+            firstTransferOrbit.PerigeeRadius = _manouverOrbits["initialOrbit"].PerigeeRadius;
+            firstTransferOrbit.ApogeeRadius = _manouverConfig.FirstBiEllipseApogge.Value;
+
+            firstTransferOrbit = GetOrbitParameters(firstTransferOrbit, "Orbita de Transferência 1", true);
+
+            _manouverOrbits.Add("firstTransferOrbit", firstTransferOrbit);
+        }
+
+        private void SetupSecondBiEllipticOrbit()
+        {
+            Orbit secondTransferOrbit = new Orbit();
+
+            secondTransferOrbit.PerigeeRadius = _manouverOrbits["finalOrbit"].PerigeeRadius;
+            secondTransferOrbit.ApogeeRadius = _manouverConfig.FirstBiEllipseApogge.Value;
+
+            secondTransferOrbit = GetOrbitParameters(secondTransferOrbit, "Orbita de Transferência 2", true);
+
+            _manouverOrbits.Add("secondTransferOrbit", secondTransferOrbit);
+        }
+
+        private void CalculateBiEllipticManouver()
+        {
+            double firstDeltaV = _manouverOrbits["firstTransferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
+
+            double secondDeltaV = _manouverOrbits["secondTransferOrbit"].ApogeeVelocity - _manouverOrbits["firstTransferOrbit"].ApogeeVelocity;
+
+            double thirdDeltaV = _manouverOrbits["secondTransferOrbit"].PerigeeVelocity - _manouverOrbits["finalOrbit"].PerigeeVelocity;
+
+            double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV) + Math.Abs(thirdDeltaV);
+
+            _manouverResult.DeltaV.Add("BiEliptico Primeiro Delta V", firstDeltaV);
+            _manouverResult.DeltaV.Add("BiEliptico Segundo Delta V", secondDeltaV);
+            _manouverResult.DeltaV.Add("BiEliptico Terceiro Delta V", thirdDeltaV);
+            _manouverResult.DeltaV.Add("BiEliptico Delta V Total", totalDeltaV);
+        }
+
+        #endregion[BI ELLIPTIC]
+
+        #region[MANOUVER]
 
         private void SimulateManouver()
         {
             _earth = _planetRepository.GetByNasaBodyId(399);
 
-
             _manouverResult.Planets = new List<Planet>() { new Planet() };
 
-
-            List<Orbit> orbits = new List<Orbit>
-            {
-                _initialOrbit,
-                _transferOrbit,
-                _finalOrbit
-            };
-
             // CAN DO IT ASYNC
-            foreach (Orbit orbit in orbits)
+            foreach (Orbit orbit in _manouverOrbits.Values)
             {
-                Planet equivalentPlanet = CreateEquivalentPlanet(orbit);
-
-                List<Planet> simulationPlanets = new List<Planet>();
-
-                simulationPlanets.Add(_earth);
-                simulationPlanets.Add(equivalentPlanet);
-
-                SimulationConfig simulationConfig = new SimulationConfig();
-                simulationConfig.InitialDate = DateTime.Now;
-                simulationConfig.Planets = simulationPlanets;
-                simulationConfig.SimulationInSeconds = orbit.PeriodInSeconds;
-                simulationConfig.SimulationSteps = 10_000;
+                List<Planet> simulationPlanets = GetSimulationPlanets(orbit);
+                SimulationConfig simulationConfig = GetSimulationConfig(orbit, simulationPlanets);
 
                 SimulationResult simulationResult = _simulationApplication.SimulateForManouver(simulationConfig);
 
@@ -114,42 +175,86 @@ namespace MecOrb.Application
             }
         }
 
-        private List<Planet> GetEquivalentPlanets()
+        private List<Planet> GetSimulationPlanets(Orbit orbit)
         {
-            List<Planet> equivalentPlanets = new List<Planet>();
+            List<Planet> simulationPlanets = new List<Planet>();
 
-            List<Orbit> orbits = new List<Orbit>
-            {
-                _initialOrbit,
-                _transferOrbit,
-                _finalOrbit
-            };
+            Planet equivalentPlanet = CreateEquivalentPlanet(orbit);
+            simulationPlanets.Add(_earth);
+            simulationPlanets.Add(equivalentPlanet);
 
-            foreach (Orbit orbit in orbits)
-            {
-                Planet planet = CreateEquivalentPlanet(orbit);
-                equivalentPlanets.Add(planet);
-            }
-
-            return equivalentPlanets;
+            return simulationPlanets;
         }
 
         private Planet CreateEquivalentPlanet(Orbit orbit)
         {
-            Planet planet = new Planet();
+            Planet planet = new Planet
+            {
+                Name = orbit.Name,
+                NamePTBR = orbit.Name,
 
-            planet.Name = orbit.Name;
-            planet.NamePTBR = orbit.Name;
+                NasaHorizonBodyId = -1,
+                Mass = 2_000,
+                Radius = 0.001,
 
-            planet.NasaHorizonBodyId = -1;
-            planet.Mass = 2_000; // kg, calculate?
-            planet.Radius = 0.01; // km, calculate?
-
-            planet.CurrentVelocity = new Vector3(0, orbit.PerigeeVelocity, 0);
-            planet.CurrentPosition = new Vector3(orbit.PerigeeRadius, 0, 0);
+                CurrentVelocity = GetOrbitCurrentVelocity(orbit),
+                CurrentPosition = GetOrbitCurrentPosition(orbit)
+            };
 
             return planet;
         }
+
+        private Vector3 GetOrbitCurrentPosition(Orbit orbit)
+        {
+            double currentPosition = orbit.PerigeeRadius;
+
+            bool inTransfer = orbit.Name.Contains("Transferência");
+
+            if (inTransfer)
+            {
+                currentPosition = orbit.ApogeeRadius * -1;
+            }
+
+            return new Vector3(currentPosition, 0, 0);
+        }
+
+        private Vector3 GetOrbitCurrentVelocity(Orbit orbit)
+        {
+            double currentVelocity = orbit.PerigeeVelocity;
+
+            bool inTransfer = orbit.Name.Contains("Transferência");
+
+
+            if (inTransfer)
+            {
+                currentVelocity = orbit.ApogeeVelocity;
+            }
+
+
+            bool isSecondManouver = orbit.Name.Contains("2");
+
+            if (isSecondManouver)
+            {
+                currentVelocity *= -1;
+            }
+
+            return new Vector3(0, currentVelocity, 0);
+        }
+
+        private SimulationConfig GetSimulationConfig(Orbit orbit, List<Planet> simulationPlanets)
+        {
+            SimulationConfig simulationConfig = new SimulationConfig();
+            simulationConfig.InitialDate = DateTime.Now;
+            simulationConfig.Planets = simulationPlanets;
+            simulationConfig.SimulationInSeconds = orbit.PeriodInSeconds;
+            simulationConfig.SimulationSteps = 10_000;
+
+            return simulationConfig;
+        }
+
+        #endregion[MANOUVER]
+
+        #region[ORBIT PARAMETERS]
 
         private Orbit GetOrbitParameters(Orbit orbit, string orbitName, bool transferOrbit = false)
         {
@@ -162,7 +267,7 @@ namespace MecOrb.Application
             GetAngularMoment(orbit);
             GetPerigeeVelocity(orbit);
             GetApogeeVelocity(orbit);
-            GetOrbitPeriod(orbit);
+            GetOrbitPeriod(orbit, transferOrbit);
 
             orbit.Name = orbitName;
 
@@ -218,5 +323,7 @@ namespace MecOrb.Application
 
             orbit.PeriodInSeconds = periodInSeconds;
         }
+
+        #endregion[ORBIT PARAMETERS]
     }
 }

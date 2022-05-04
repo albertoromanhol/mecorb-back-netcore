@@ -7,5 +7,6 @@ namespace MecOrb.Domain.Entities
     {
         public Orbit InitialOrbit { get; set; }
         public Orbit FinalOrbit { get; set; }
+        public double? FirstBiEllipseApogge { get; set; }
     }
 }

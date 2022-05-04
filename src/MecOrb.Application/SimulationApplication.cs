@@ -47,7 +47,6 @@ namespace MecOrb.Application
 
         public SimulationResult SimulateForManouver(SimulationConfig simulationConfig)
         {
-
             _simulationResult = new SimulationResult();
 
             _simulationConfig = simulationConfig;
@@ -73,8 +72,7 @@ namespace MecOrb.Application
             int finalNumberSteps = simulationSteps.HasValue ? simulationSteps.Value : 1_000_000;
             int finalSimulationDays = simulationDays;
 
-            double simulationTimeSeconds = 0.0;
-
+            double simulationTimeSeconds;
             if (_simulationConfig.SimulationInSeconds.HasValue)
             {
                 simulationTimeSeconds = _simulationConfig.SimulationInSeconds.Value;

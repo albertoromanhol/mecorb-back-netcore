@@ -5,9 +5,7 @@ namespace MecOrb.Domain.Entities
 {
     public class ManouverResult : Entity, IAggregateRoot
     {
-        public double FirstDeltaV { get; set; }
-        public double SecondDeltaV { get; set; }
-        public double TotalDeltaV { get; set; }
+        public Dictionary<string, double> DeltaV { get; set; }
         public List<Planet> Planets { get; set; }
     }
 }

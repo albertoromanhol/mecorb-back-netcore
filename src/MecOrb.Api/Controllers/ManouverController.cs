@@ -27,7 +27,20 @@ namespace MecOrb.Api.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public IActionResult SimulateHohmann(ManouverConfigModel manouverConfig)
         {
-            ManouverResult manouverResult = _manouverApplication.Simulate(manouverConfig);
+            ManouverResult manouverResult = _manouverApplication.Hohmann(manouverConfig);
+
+            return Ok(_mapper.Map<ManouverResult, ManouverResultModel>(manouverResult));
+        }
+
+
+        [HttpPost]
+        [Route("bi-elliptic")]
+        [ProducesResponseType(typeof(SimulationResultModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public IActionResult SimulateBiElliptic(ManouverConfigModel manouverConfig)
+        {
+            ManouverResult manouverResult = _manouverApplication.BiElliptic(manouverConfig);
 
             return Ok(_mapper.Map<ManouverResult, ManouverResultModel>(manouverResult));
         }

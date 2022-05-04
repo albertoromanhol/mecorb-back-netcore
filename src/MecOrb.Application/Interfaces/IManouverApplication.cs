@@ -5,6 +5,7 @@ namespace MecOrb.Application.Interfaces
 {
     public interface IManouverApplication
     {
-        ManouverResult Simulate(ManouverConfigModel manouverConfigModel);
+        ManouverResult Hohmann(ManouverConfigModel manouverConfigModel);
+        ManouverResult BiElliptic(ManouverConfigModel manouverConfigModel);
     }
 }
