@@ -7,5 +7,6 @@ namespace MecOrb.Application.Interfaces
     {
         ManouverResult Hohmann(ManouverConfigModel manouverConfigModel);
         ManouverResult BiElliptic(ManouverConfigModel manouverConfigModel);
+        ManouverResult CompareHohmannAndBiElliptic(ManouverConfigModel manouverConfigModel);
     }
 }

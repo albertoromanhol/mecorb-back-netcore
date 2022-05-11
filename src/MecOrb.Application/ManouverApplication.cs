@@ -62,6 +62,25 @@ namespace MecOrb.Application
 
             return _manouverResult;
         }
+        public ManouverResult CompareHohmannAndBiElliptic(ManouverConfigModel manouverConfigModel)
+        {
+            _manouverResult = new ManouverResult();
+
+            _manouverConfig = _mapper.Map<ManouverConfigModel, ManouverConfig>(manouverConfigModel);
+
+            SetupInitialOrbits();
+
+            SetupHohmannTransferOrbit();
+            CalculateHohmannManouver();
+
+            SetupBiEllipticTransferOrbit();
+            CalculateBiEllipticManouver();
+
+            SimulateManouver();
+
+            return _manouverResult;
+        }
+
 
         #endregion[METHODS]
 
@@ -85,22 +104,22 @@ namespace MecOrb.Application
             hohmannTransferOrbit.PerigeeRadius = _manouverOrbits["initialOrbit"].PerigeeRadius;
             hohmannTransferOrbit.ApogeeRadius = _manouverOrbits["finalOrbit"].ApogeeRadius;
 
-            hohmannTransferOrbit = GetOrbitParameters(hohmannTransferOrbit, "Orbita de Transferência", true);
+            hohmannTransferOrbit = GetOrbitParameters(hohmannTransferOrbit, "Orbita de Transferência - Hohmann", true);
 
-            _manouverOrbits.Add("transferOrbit", hohmannTransferOrbit);
+            _manouverOrbits.Add("hohmannTransferOrbit", hohmannTransferOrbit);
         }
 
         private void CalculateHohmannManouver()
         {
-            double firstDeltaV = _manouverOrbits["transferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
+            double firstDeltaV = _manouverOrbits["hohmannTransferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
 
-            double secondDeltaV = _manouverOrbits["finalOrbit"].ApogeeVelocity - _manouverOrbits["transferOrbit"].ApogeeVelocity;
+            double secondDeltaV = _manouverOrbits["finalOrbit"].ApogeeVelocity - _manouverOrbits["hohmannTransferOrbit"].ApogeeVelocity;
 
             double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV);
 
-            _manouverResult.DeltaV.Add("Hohmann Primeiro Delta V", firstDeltaV);
-            _manouverResult.DeltaV.Add("Hohmann Segundo Delta V", secondDeltaV);
-            _manouverResult.DeltaV.Add("Hohmann Delta V Total", totalDeltaV);
+            _manouverResult.DeltaV.Add("Hohmann - Primeiro Delta V", firstDeltaV);
+            _manouverResult.DeltaV.Add("Hohmann - Segundo Delta V", secondDeltaV);
+            _manouverResult.DeltaV.Add("Hohmann - Delta V Total", totalDeltaV);
         }
 
         #endregion[HOHMANN]
@@ -119,9 +138,9 @@ namespace MecOrb.Application
             firstTransferOrbit.PerigeeRadius = _manouverOrbits["initialOrbit"].PerigeeRadius;
             firstTransferOrbit.ApogeeRadius = _manouverConfig.FirstBiEllipseApogge.Value;
 
-            firstTransferOrbit = GetOrbitParameters(firstTransferOrbit, "Orbita de Transferência 1", true);
+            firstTransferOrbit = GetOrbitParameters(firstTransferOrbit, "Orbita de Transferência 1 - Bi Eliptica", true);
 
-            _manouverOrbits.Add("firstTransferOrbit", firstTransferOrbit);
+            _manouverOrbits.Add("biEllipticFirstTransferOrbit", firstTransferOrbit);
         }
 
         private void SetupSecondBiEllipticOrbit()
@@ -131,25 +150,25 @@ namespace MecOrb.Application
             secondTransferOrbit.PerigeeRadius = _manouverOrbits["finalOrbit"].PerigeeRadius;
             secondTransferOrbit.ApogeeRadius = _manouverConfig.FirstBiEllipseApogge.Value;
 
-            secondTransferOrbit = GetOrbitParameters(secondTransferOrbit, "Orbita de Transferência 2", true);
+            secondTransferOrbit = GetOrbitParameters(secondTransferOrbit, "Orbita de Transferência 2 - Bi Eliptica", true);
 
-            _manouverOrbits.Add("secondTransferOrbit", secondTransferOrbit);
+            _manouverOrbits.Add("biEllipticSecondTransferOrbit", secondTransferOrbit);
         }
 
         private void CalculateBiEllipticManouver()
         {
-            double firstDeltaV = _manouverOrbits["firstTransferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
+            double firstDeltaV = _manouverOrbits["biEllipticFirstTransferOrbit"].PerigeeVelocity - _manouverOrbits["initialOrbit"].PerigeeVelocity;
 
-            double secondDeltaV = _manouverOrbits["secondTransferOrbit"].ApogeeVelocity - _manouverOrbits["firstTransferOrbit"].ApogeeVelocity;
+            double secondDeltaV = _manouverOrbits["biEllipticSecondTransferOrbit"].ApogeeVelocity - _manouverOrbits["biEllipticFirstTransferOrbit"].ApogeeVelocity;
 
-            double thirdDeltaV = _manouverOrbits["secondTransferOrbit"].PerigeeVelocity - _manouverOrbits["finalOrbit"].PerigeeVelocity;
+            double thirdDeltaV = _manouverOrbits["biEllipticSecondTransferOrbit"].PerigeeVelocity - _manouverOrbits["finalOrbit"].PerigeeVelocity;
 
             double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV) + Math.Abs(thirdDeltaV);
 
-            _manouverResult.DeltaV.Add("BiEliptico Primeiro Delta V", firstDeltaV);
-            _manouverResult.DeltaV.Add("BiEliptico Segundo Delta V", secondDeltaV);
-            _manouverResult.DeltaV.Add("BiEliptico Terceiro Delta V", thirdDeltaV);
-            _manouverResult.DeltaV.Add("BiEliptico Delta V Total", totalDeltaV);
+            _manouverResult.DeltaV.Add("Bi Eliptica - Primeiro Delta V", firstDeltaV);
+            _manouverResult.DeltaV.Add("Bi Eliptica - Segundo Delta V", secondDeltaV);
+            _manouverResult.DeltaV.Add("Bi Eliptica - Terceiro Delta V", thirdDeltaV);
+            _manouverResult.DeltaV.Add("Bi Eliptica - Delta V Total", totalDeltaV);
         }
 
         #endregion[BI ELLIPTIC]

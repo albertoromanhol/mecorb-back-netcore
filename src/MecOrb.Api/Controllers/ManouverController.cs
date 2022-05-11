@@ -32,7 +32,6 @@ namespace MecOrb.Api.Controllers
             return Ok(_mapper.Map<ManouverResult, ManouverResultModel>(manouverResult));
         }
 
-
         [HttpPost]
         [Route("bi-elliptic")]
         [ProducesResponseType(typeof(SimulationResultModel), StatusCodes.Status200OK)]
@@ -41,6 +40,18 @@ namespace MecOrb.Api.Controllers
         public IActionResult SimulateBiElliptic(ManouverConfigModel manouverConfig)
         {
             ManouverResult manouverResult = _manouverApplication.BiElliptic(manouverConfig);
+
+            return Ok(_mapper.Map<ManouverResult, ManouverResultModel>(manouverResult));
+        }
+
+        [HttpPost]
+        [Route("hohmann-and-bi-elliptic")]
+        [ProducesResponseType(typeof(SimulationResultModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public IActionResult SimulateHomannAndBiElliptic(ManouverConfigModel manouverConfig)
+        {
+            ManouverResult manouverResult = _manouverApplication.CompareHohmannAndBiElliptic(manouverConfig);
 
             return Ok(_mapper.Map<ManouverResult, ManouverResultModel>(manouverResult));
         }

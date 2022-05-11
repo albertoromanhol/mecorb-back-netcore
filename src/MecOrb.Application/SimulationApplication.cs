@@ -132,7 +132,7 @@ namespace MecOrb.Application
             }
             catch (CollisionException collisionException)
             {
-                // write in _result
+                // write in _result to show to user
                 Console.WriteLine(collisionException.Message);
             }
 
