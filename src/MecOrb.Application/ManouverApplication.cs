@@ -73,6 +73,8 @@ namespace MecOrb.Application
             SetupHohmannTransferOrbit();
             CalculateHohmannManouver();
 
+            _manouverResult.DeltaV.Add("", 0);
+
             SetupBiEllipticTransferOrbit();
             CalculateBiEllipticManouver();
 
@@ -117,9 +119,11 @@ namespace MecOrb.Application
 
             double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV);
 
-            _manouverResult.DeltaV.Add("Hohmann - Primeiro Delta V", firstDeltaV);
-            _manouverResult.DeltaV.Add("Hohmann - Segundo Delta V", secondDeltaV);
-            _manouverResult.DeltaV.Add("Hohmann - Delta V Total", totalDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_H_1", firstDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_H_2", secondDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_H", totalDeltaV);
+
+            CalculateDeltaMassPropellant("ΔM_H", totalDeltaV);
         }
 
         #endregion[HOHMANN]
@@ -165,10 +169,13 @@ namespace MecOrb.Application
 
             double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV) + Math.Abs(thirdDeltaV);
 
-            _manouverResult.DeltaV.Add("Bi Eliptica - Primeiro Delta V", firstDeltaV);
-            _manouverResult.DeltaV.Add("Bi Eliptica - Segundo Delta V", secondDeltaV);
-            _manouverResult.DeltaV.Add("Bi Eliptica - Terceiro Delta V", thirdDeltaV);
-            _manouverResult.DeltaV.Add("Bi Eliptica - Delta V Total", totalDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_BE_1", firstDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_BE_2", secondDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_BE_3", thirdDeltaV);
+            _manouverResult.DeltaV.Add("ΔV_BE", totalDeltaV);
+
+
+            CalculateDeltaMassPropellant("ΔM_BE_1", totalDeltaV);
         }
 
         #endregion[BI ELLIPTIC]
@@ -180,8 +187,9 @@ namespace MecOrb.Application
             _earth = _planetRepository.GetByNasaBodyId(399);
 
             _manouverResult.Planets = new List<Planet>() { new Planet() };
+            _manouverResult.Collision = new List<string>();
+            _manouverResult.Time = new List<double>();
 
-            // CAN DO IT ASYNC
             foreach (Orbit orbit in _manouverOrbits.Values)
             {
                 List<Planet> simulationPlanets = GetSimulationPlanets(orbit);
@@ -191,6 +199,11 @@ namespace MecOrb.Application
 
                 _manouverResult.Planets[0] = simulationResult.Planets.FirstOrDefault(planet => planet.NasaHorizonBodyId == 399);
                 _manouverResult.Planets.Add(simulationResult.Planets.FirstOrDefault(planet => planet.NasaHorizonBodyId == -1));
+                _manouverResult.TrajectoryPoints = simulationResult.TrajectoryPoints;
+                _manouverResult.Time = simulationResult.Time;
+
+                if (simulationResult.Collision != null && simulationResult.Collision.Any())
+                    _manouverResult.Collision.AddRange(simulationResult.Collision);
             }
         }
 
@@ -242,7 +255,6 @@ namespace MecOrb.Application
             double currentVelocity = orbit.PerigeeVelocity;
 
             bool inTransfer = orbit.Name.Contains("Transferência");
-
 
             if (inTransfer)
             {
@@ -341,6 +353,23 @@ namespace MecOrb.Application
             }
 
             orbit.PeriodInSeconds = periodInSeconds;
+        }
+
+        private void CalculateDeltaMassPropellant(string orbitName, double totalDeltaV)
+        {
+            double Isp = 300;
+            double g0 = 9.81;
+            double bodyMass = 2_000;
+
+
+            double exponentialPower = -(totalDeltaV / (Isp * g0));
+
+            double massRatio = 1 - Math.Exp(exponentialPower);
+
+            double deltaMassPropellant = massRatio * bodyMass;
+
+
+            _manouverResult.DeltaV.Add(orbitName, deltaMassPropellant);
         }
 
         #endregion[ORBIT PARAMETERS]

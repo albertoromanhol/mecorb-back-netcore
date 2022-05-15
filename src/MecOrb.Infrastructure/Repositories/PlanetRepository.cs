@@ -33,16 +33,16 @@ namespace MecOrb.Infrastructure.Repositories
         // TODO: create a new file, thats return the planets
         private List<PlanetDbModel> GetPlanets()
         {
-            PlanetDbModel sun = new PlanetDbModel(0, "Sun", "Sol", 0, 1988500e24, 695700);
-            PlanetDbModel mercury = new PlanetDbModel(1, "Mercury", "Mercúrio", 199, 302e23, 2440);
-            PlanetDbModel venus = new PlanetDbModel(2, "Venus", "Vênus", 299, 48.685e23, 6051.84);
-            PlanetDbModel moon = new PlanetDbModel(9, "Moon", "Lua", 301, 7.349e22, 1737.53);
-            PlanetDbModel earth = new PlanetDbModel(3, "Earth", "Terra", 399, 5.97219e24, 6371.01);
-            PlanetDbModel mars = new PlanetDbModel(4, "Mars", "Marte", 499, 6.4171e23, 3389.92);
-            PlanetDbModel jupiter = new PlanetDbModel(5, "Jupiter", "Júpiter", 599, 1898.13e24, 69911);
-            PlanetDbModel saturn = new PlanetDbModel(6, "Saturn", "Saturno", 699, 5.6835e26, 58232);
-            PlanetDbModel uranus = new PlanetDbModel(7, "Uranus", "Urano", 799, 86.813e24, 25362);
-            PlanetDbModel neptune = new PlanetDbModel(8, "Neptune", "Netuno", 899, 1.0243e26, 24624);
+            PlanetDbModel sun = new PlanetDbModel(0, "Sun", "Sol", 0, 1.989e30, 696_500);
+            PlanetDbModel mercury = new PlanetDbModel(1, "Mercury", "Mercúrio", 199, 330.2e21, 2_440);
+            PlanetDbModel venus = new PlanetDbModel(2, "Venus", "Vênus", 299, 4.869e24, 6_052);
+            PlanetDbModel earth = new PlanetDbModel(3, "Earth", "Terra", 399, 5.97219e24, 6_378);
+            PlanetDbModel moon = new PlanetDbModel(9, "Moon", "Lua", 301, 73.48e21, 1_737);
+            PlanetDbModel mars = new PlanetDbModel(4, "Mars", "Marte", 499, 641.9e21, 3_396);
+            PlanetDbModel jupiter = new PlanetDbModel(5, "Jupiter", "Júpiter", 599, 1.899e27, 71_490);
+            PlanetDbModel saturn = new PlanetDbModel(6, "Saturn", "Saturno", 699, 568.5e24, 60_270);
+            PlanetDbModel uranus = new PlanetDbModel(7, "Uranus", "Urano", 799, 86.83e24, 25_560);
+            PlanetDbModel neptune = new PlanetDbModel(8, "Neptune", "Netuno", 899, 102.4e24, 24_760);
 
             List<PlanetDbModel> planets = new List<PlanetDbModel>()
             {

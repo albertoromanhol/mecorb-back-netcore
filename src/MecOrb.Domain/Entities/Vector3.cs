@@ -52,13 +52,7 @@ namespace MecOrb.Domain.Entities
                 Y = v1.Y / value,
                 Z = v1.Z / value,
             };
-        //public static VectorXYZ operator *(Matrix matrix, VectorXYZ v1)
-        //    => new VectorXYZ
-        //    {
-        //        X = Methods.dotProduct(matrix.RowX(), v1),
-        //        Y = Methods.dotProduct(matrix.RowY(), v1),
-        //        Z = Methods.dotProduct(matrix.RowZ(), v1),
-        //    };
+
         public double Norm() => Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2));
     }
 }

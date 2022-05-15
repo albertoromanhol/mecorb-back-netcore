@@ -2,10 +2,9 @@
 
 namespace MecOrb.Application.Models
 {
-    public class ManouverResultModel
+    public class ManouverResultModel : SimulationResultModel
     {
         public Dictionary<string, double> DeltaV { get; set; }
-        public List<PlanetModel> Planets { get; set; }
 
     }
 }
