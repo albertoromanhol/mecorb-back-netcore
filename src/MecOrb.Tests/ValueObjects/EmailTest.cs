@@ -22,8 +22,8 @@ namespace MecOrb.Tests.ValueObjects
         }
 
         [Theory]
-        [InlineData("joao@localiza.com")]
-        [InlineData("joao.souza@localiza.com")]
+        [InlineData("joao@email.com")]
+        [InlineData("joao.souza@email.com")]
         [InlineData("joao.silva@microsoft.com.br")]
         public void CriarEmail_EmailValido_Test(string endereco)
         {
