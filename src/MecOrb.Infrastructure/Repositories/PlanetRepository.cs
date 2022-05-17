@@ -50,12 +50,12 @@ namespace MecOrb.Infrastructure.Repositories
                 mercury,
                 venus,
                 earth,
+                moon,
                 mars,
                 jupiter,
                 saturn,
                 uranus,
                 neptune,
-                //moon
             };
 
             return planets;

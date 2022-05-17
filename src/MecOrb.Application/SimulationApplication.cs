@@ -72,25 +72,21 @@ namespace MecOrb.Application
         private void SetupSimulationTimeParams(int simulationDays = 365, int? simulationSteps = 100_000)
         {
             int finalNumberSteps = simulationSteps.HasValue ? simulationSteps.Value : 100_000;
-            int finalSimulationDays = simulationDays;
 
             double simulationTimeSeconds;
             if (_simulationConfig.SimulationInSeconds.HasValue)
             {
-                simulationTimeSeconds = _simulationConfig.SimulationInSeconds.Value;
+                _simulationTimeSeconds = _simulationConfig.SimulationInSeconds.Value;
             }
             else
             {
-                simulationTimeSeconds = finalSimulationDays
+                _simulationTimeSeconds = simulationDays
                                             * DAY_IN_HOURS
                                             * HOUR_IN_MINUTES
                                             * MINUTE_IN_SECONDS;
             }
 
-            double timeStep = simulationTimeSeconds / finalNumberSteps;
-
-            _simulationTimeSeconds = simulationTimeSeconds;
-            _timeStep = timeStep;
+            _timeStep = _simulationTimeSeconds / finalNumberSteps;
         }
 
         private void SetupSimulationPlanets(List<Planet> planets, DateTime initialDate, bool withEphemerities = true)
