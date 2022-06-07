@@ -4,11 +4,11 @@ using MecOrb.Domain.Entities;
 
 namespace MecOrb.Application.Mapping
 {
-    public class OrbitMap : Profile
+    public class SpacecraftMap : Profile
     {
-        public OrbitMap()
+        public SpacecraftMap()
         {
-            CreateMap<Orbit, OrbitModel>()
+            CreateMap<Spacecraft, SpacecraftModel>()
                 .ReverseMap();
         }
     }

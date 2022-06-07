@@ -32,16 +32,36 @@ namespace MecOrb.Application
 
         public SimulationResult Simulate(SimulationConfigModel simulationConfigModel)
         {
+            TimeSpan startSimulation = DateTime.Now.TimeOfDay;
+
             _simulationResult = new SimulationResult();
 
             _simulationConfig = _mapper.Map<SimulationConfigModel, SimulationConfig>(simulationConfigModel);
 
+            TimeSpan startSetup = DateTime.Now.TimeOfDay;
+
             SetupSimulation();
+
+            TimeSpan endSetup = DateTime.Now.TimeOfDay;
+
+            TimeSpan startGetAcceleration = DateTime.Now.TimeOfDay;
+
             GetPlanetsAcceleration();
+
+            TimeSpan endGetAcceleration = DateTime.Now.TimeOfDay;
+
+            TimeSpan startReduce = DateTime.Now.TimeOfDay;
+
             ReduceTrajectories();
+
+            TimeSpan endReduce = DateTime.Now.TimeOfDay;
 
             _simulationResult.Planets = _planets;
             _simulationResult.TrajectoryPoints = _planets.First().Trajectory.X.Count;
+
+            TimeSpan endSimulation = DateTime.Now.TimeOfDay;
+
+            LogResults(startSimulation, startSetup, endSetup, startGetAcceleration, endGetAcceleration, startReduce, endReduce, endSimulation);
 
             return _simulationResult;
         }
@@ -62,6 +82,47 @@ namespace MecOrb.Application
             return _simulationResult;
         }
 
+        private void LogResults(TimeSpan startSimulation, TimeSpan startSetup, TimeSpan endSetup, TimeSpan startGetAcceleration, TimeSpan endGetAcceleration, TimeSpan startReduce, TimeSpan endReduce, TimeSpan endSimulation)
+        {
+            Console.WriteLine();
+            Console.WriteLine("############################################");
+            Console.WriteLine("Análise PNC");
+            Console.Write("Planetas: ");
+            Console.WriteLine(String.Join(", ", _simulationResult.Planets.Select(p => p.Name)));
+
+            Console.Write("Simulation Days: ");
+            Console.WriteLine(_simulationConfig.SimulationDays);
+
+            Console.Write("Steps qtd: ");
+            Console.WriteLine(_simulationConfig.SimulationSteps);
+
+            Console.Write("Time Step (seconds): ");
+            Console.WriteLine(_timeStep);
+
+            WriteResult("Delta Setup", startSetup, endSetup);
+            WriteResult("Delta Acceleration", startGetAcceleration, endGetAcceleration);
+            WriteResult("Delta Reduce", startReduce, endReduce);
+            WriteResult("Delta Simulation", startSimulation, endSimulation);
+
+            Console.WriteLine("############################################");
+        }
+
+        private void WriteResult(String description, TimeSpan start, TimeSpan end)
+        {
+            Console.WriteLine("--------------------------------------------");
+            Console.WriteLine();
+            Console.Write(description + ": ");
+            Console.Write(GetMS(start, end));
+            Console.WriteLine(" seconds");
+            Console.WriteLine();
+        }
+
+        private double GetMS(TimeSpan start, TimeSpan end)
+        {
+            return (end - start).TotalSeconds;
+        }
+
+
         #region[SETUP SIMULATOR]
         private void SetupSimulation(bool withEphemerities = true)
         {
@@ -73,7 +134,6 @@ namespace MecOrb.Application
         {
             int finalNumberSteps = simulationSteps.HasValue ? simulationSteps.Value : 100_000;
 
-            double simulationTimeSeconds;
             if (_simulationConfig.SimulationInSeconds.HasValue)
             {
                 _simulationTimeSeconds = _simulationConfig.SimulationInSeconds.Value;
@@ -112,11 +172,12 @@ namespace MecOrb.Application
         #region[ACCELERATION]
         private void GetPlanetsAcceleration()
         {
+            double currentTime = 0;
+
             try
             {
                 _simulationResult.Time = new List<double>();
 
-                double currentTime = 0;
 
                 while (currentTime <= _simulationTimeSeconds)
                 {
@@ -136,7 +197,7 @@ namespace MecOrb.Application
                 if (_simulationResult.Collision == null)
                     _simulationResult.Collision = new List<string>();
 
-                _simulationResult.Collision.Add(collisionException.Message);
+                _simulationResult.Collision.Add(collisionException.Message + $". Decorridos {Math.Round(currentTime/(60*60*24), 1)} dias.");
             }
 
         }

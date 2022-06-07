@@ -1,7 +1,6 @@
 ﻿using MecOrb.Domain.Core.Entities;
-using MecOrb.Domain.Entities;
 
-namespace MecOrb.Application.Models
+namespace MecOrb.Domain.Entities
 {
     public class Orbit : Entity, IAggregateRoot
     {

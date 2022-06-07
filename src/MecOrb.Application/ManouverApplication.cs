@@ -165,7 +165,7 @@ namespace MecOrb.Application
 
             double secondDeltaV = _manouverOrbits["biEllipticSecondTransferOrbit"].ApogeeVelocity - _manouverOrbits["biEllipticFirstTransferOrbit"].ApogeeVelocity;
 
-            double thirdDeltaV = _manouverOrbits["biEllipticSecondTransferOrbit"].PerigeeVelocity - _manouverOrbits["finalOrbit"].PerigeeVelocity;
+            double thirdDeltaV = _manouverOrbits["finalOrbit"].PerigeeVelocity - _manouverOrbits["biEllipticSecondTransferOrbit"].PerigeeVelocity;
 
             double totalDeltaV = Math.Abs(firstDeltaV) + Math.Abs(secondDeltaV) + Math.Abs(thirdDeltaV);
 
@@ -357,12 +357,12 @@ namespace MecOrb.Application
 
         private void CalculateDeltaMassPropellant(string orbitName, double totalDeltaV)
         {
-            double Isp = 300;
+            double Isp = _manouverConfig.Spacecraft.Isp;
             double g0 = 9.81;
-            double bodyMass = 2_000;
+            double bodyMass = _manouverConfig.Spacecraft.Mass;
 
 
-            double exponentialPower = -(totalDeltaV / (Isp * g0));
+            double exponentialPower = -( (totalDeltaV * 1000) / (Isp * g0));
 
             double massRatio = 1 - Math.Exp(exponentialPower);
 

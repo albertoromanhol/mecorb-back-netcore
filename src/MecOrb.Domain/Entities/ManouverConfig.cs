@@ -1,5 +1,4 @@
-﻿using MecOrb.Application.Models;
-using MecOrb.Domain.Core.Entities;
+﻿using MecOrb.Domain.Core.Entities;
 
 namespace MecOrb.Domain.Entities
 {
@@ -8,5 +7,6 @@ namespace MecOrb.Domain.Entities
         public Orbit InitialOrbit { get; set; }
         public Orbit FinalOrbit { get; set; }
         public double? FirstBiEllipseApogge { get; set; }
+        public Spacecraft Spacecraft { get; set; }
     }
 }

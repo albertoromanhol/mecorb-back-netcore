@@ -5,5 +5,6 @@
         public OrbitModel InitialOrbit { get; set; }
         public OrbitModel FinalOrbit { get; set; }
         public double? FirstBiEllipseApogge { get; set; }
+        public SpacecraftModel Spacecraft { get; set; }
     }
 }
